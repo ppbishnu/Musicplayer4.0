@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/albumIV"
+        android:layout_width="match_parent"
+        android:scaleType="centerCrop"
+        android:layout_height="130dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/gradient_albuminfo"
+        android:layout_height="20dp">
+        <TextView
+            android:id="@+id/album_nameTV"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:paddingRight="60dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:textStyle="bold"
+            android:text="Album Name"
+            android:gravity="left"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            android:textColor="#ffffff"
+            />
+        <TextView
+            android:id="@+id/No_Of_SongsTV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textStyle="bold"
+            android:text="5 tracks"
+            android:textSize="12sp"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            android:textColor="#ffffff"
+            />
+    </RelativeLayout>
+
+</RelativeLayout>
