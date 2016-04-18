@@ -13,6 +13,42 @@
         android:divider="#ffffff"
         android:dividerHeight="3dp"
         />-->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="40dip"
+    android:orientation="horizontal"
+    android:id="@+id/songlistbar">
+    <Button
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/btnlistbyalbum"
+        android:text="Album List"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:clickable="false"
+        android:background="@drawable/btnbackground"/>
+    <Button
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="All Song List"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:id="@+id/btnallsonglist"
+        android:background="@drawable/btnbackground"/>
+
+    <Button
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:text="Artist List"
+        android:id="@+id/btnlistbyartist"
+        android:background="@drawable/btnbackground"/>
+
+</LinearLayout>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,11 +58,26 @@
         android:scaleType="centerCrop"
         />
 
-    <GridView
+    <ListView
+        android:id="@+id/SongLV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="1dp"
+        android:clickable="true"
+        android:visibility="invisible"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/songlistbar" />
+    <GridView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:id="@+id/albumgv"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/songlistbar"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:verticalSpacing="10dp"
@@ -34,5 +85,6 @@
         android:padding="10dp"
         android:numColumns="2"
         android:alpha="1"
-        />
+        android:layout_below="@+id/songlistbar"
+        android:visibility="visible"/>
 </RelativeLayout>

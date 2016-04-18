@@ -48,12 +48,13 @@ public class SongListActivity extends AppCompatActivity {
             }
         });
 
-        /*SongListView.setOnClickListener(new View.OnClickListener() {
+        SongListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                Util.toast("click2",SongListActivity.this);
-                Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Util.toast("ldjfljdf",getApplicationContext());
+
             }
-        });*/
+        });
+
     }
 }

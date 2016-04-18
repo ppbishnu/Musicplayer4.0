@@ -2,16 +2,21 @@ package com.example.bishnureddy.musicplayer40.Activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.bishnureddy.musicplayer40.Adapter.AlbumAdapter;
+import com.example.bishnureddy.musicplayer40.Adapter.SongListAdapter;
 import com.example.bishnureddy.musicplayer40.R;
 import com.example.bishnureddy.musicplayer40.Utility.Util;
 import com.example.bishnureddy.musicplayer40.helper.DatabaseHelper;
@@ -25,7 +30,11 @@ public class AlbumActivity extends AppCompatActivity {
 
     static ArrayList<Song> songList;
     static GridView albumGridView;
+    static Button btnAlbumList;
+    static Button btnAllSongList;
+    static Button btnArtistList;
     static byte[] art;
+    static ListView SongListView;
     Album album;
    DatabaseHelper db;
     @Override
@@ -53,8 +62,10 @@ public class AlbumActivity extends AppCompatActivity {
         ArrayList<Song> songsFile = new ArrayList<Song>();
         songsFile = findSongs(Environment.getExternalStorageDirectory());
 
-
-
+        btnAlbumList=(Button)findViewById(R.id.btnlistbyalbum);
+        btnAllSongList=(Button)findViewById(R.id.btnallsonglist);
+        btnArtistList=(Button)findViewById(R.id.btnlistbyartist);
+        SongListView=(ListView)findViewById(R.id.SongLV);
        /* long albumid = db.createAlbum(new Album(songsFile.get(5).getName(),songsFile.get(5).getSongImage(),1));
         db.createSong(songsFile.get(5),albumid);
         List<Song> songs=db.getAllSongs();
@@ -89,12 +100,14 @@ public class AlbumActivity extends AppCompatActivity {
                     album.setAlbumImage(songsFile.get(i).getSongImage());
                     album.setNo_Of_Songs(1);
                     albumid= db.createAlbum(album);
-                    db.createSong(songsFile.get(i),albumid);
+                    songsFile.get(i).setId((int)db.createSong(songsFile.get(i)));
+                    db.createAlbumSongBridge(albumid,(long)songsFile.get(i).getId());
                 }
                 else {
                     albumid=db.getAlbumIdByName(album.getName());
                     db.incrementNoSongOfAlbum(albumid);
-                    db.createSong(songsFile.get(i),albumid);
+                    songsFile.get(i).setId((int)db.createSong(songsFile.get(i)));
+                    db.createAlbumSongBridge(albumid,(long)songsFile.get(i).getId());
                 }
             }
         }
@@ -112,6 +125,74 @@ public class AlbumActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), selectedAlbum + " " + "selected.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), SongListActivity.class);
                 startActivity(intent);
+            }
+        });
+
+btnAlbumList.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        btnAlbumList.setClickable(false);
+        btnArtistList.setClickable(true);
+        btnAllSongList.setClickable(true);
+        SongListView.setVisibility(View.INVISIBLE);
+        albumGridView.setVisibility(View.VISIBLE);
+        AlbumAdapter albumAdapter = new AlbumAdapter(AlbumActivity.this, db.getAllAlbum());
+        albumGridView = (GridView) findViewById(R.id.albumgv);
+        albumGridView.setAdapter(albumAdapter);
+        setTitle("Album List");
+        albumGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedAlbum = db.getAllAlbum().get(position).getName();
+                Util.album = db.getAllAlbum().get(position);
+                Util.context=getApplicationContext();
+                Toast.makeText(getApplicationContext(), selectedAlbum + " " + "selected.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SongListActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+});
+
+        btnAllSongList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Util.toast("all song list is selected",getApplicationContext());
+                albumGridView.setVisibility(View.INVISIBLE);
+                SongListView.setVisibility(View.VISIBLE);
+                btnAllSongList.setClickable(false);
+                btnArtistList.setClickable(true);
+                btnAlbumList.setClickable(true);
+                SongListAdapter songAdapter=new SongListAdapter(AlbumActivity.this,db.getAllSongs());
+                setTitle("All Song List");
+               /* ImageView albumImage=(ImageView) findViewById(R.id.BG_albumIV);
+                if(album.getAlbumImage()==null)
+                {
+                    albumImage.setImageResource(R.mipmap.unknownimg);
+                }
+                else {
+                    albumImage.setImageBitmap(BitmapFactory.decodeByteArray(album.getAlbumImage(),0,album.getAlbumImage().length));
+                }*/
+
+                SongListView.setAdapter(songAdapter);
+                SongListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        btnArtistList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Util.toast("all Artist list is selected",getApplicationContext());
+                btnArtistList.setClickable(false);
+                btnAllSongList.setClickable(true);
+                btnAlbumList.setClickable(true);
+                albumGridView.setVisibility(View.INVISIBLE);
+                SongListView.setVisibility(View.INVISIBLE);
             }
         });
 
