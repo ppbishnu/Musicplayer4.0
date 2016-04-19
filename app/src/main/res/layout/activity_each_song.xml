@@ -2,28 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:background="@android:color/transparent"
+    android:descendantFocusability="blocksDescendants"
     android:layout_height="match_parent"
     >
-
+<ImageView
+    android:layout_width="50dp"
+    android:layout_height="40dp"
+    android:id="@+id/songimageIV"
+    android:scaleType="fitXY"
+    android:src="@mipmap/backimgalbum"
+    android:layout_alignBottom="@+id/songNameTV"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true" />
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
+        android:layout_height="50dp"
         android:id="@+id/songNameTV"
         android:textStyle="bold"
         android:textColor="@color/Black"
         android:paddingLeft="5dp"
-        android:layout_marginRight="120dp"
         android:paddingTop="8dp"
         android:textSize="15dp"
         android:singleLine="true"
         android:ellipsize="end"
         android:gravity="left"
-        android:layout_alignBottom="@+id/playIB"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_toLeftOf="@+id/Duration"
+        android:layout_alignLeft="@+id/artists"
+        android:layout_alignStart="@+id/artists" />
+       <!-- android:layout_alignBottom="@+id/playIB"-->
 
-    <ImageButton
+
+  <!--  <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/play"
@@ -35,11 +44,11 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/AddToFavIB"
         android:layout_toStartOf="@+id/AddToFavIB"
-        android:clickable="false"/>
+        android:clickable="false"/>-->
 
     <ImageButton
         android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:scaleType="fitCenter"
         android:padding="8dp"
         android:id="@+id/AddToFavIB"
@@ -48,7 +57,9 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:clickable="false"/>
+        android:clickable="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -58,11 +69,13 @@
         android:id="@+id/artists"
         android:textSize="10dp"
         android:paddingLeft="5dp"
+        android:layout_marginLeft="63dp"
+        android:layout_marginStart="63dp"
         android:layout_alignBottom="@+id/songNameTV"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView
+       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -71,6 +84,7 @@
         android:paddingTop="14dp"
         android:textSize="10dp"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/playIB"
-        android:layout_toStartOf="@+id/playIB" />
+        android:layout_toLeftOf="@+id/AddToFavIB"
+        android:layout_toStartOf="@+id/AddToFavIB" />
+
 </RelativeLayout>

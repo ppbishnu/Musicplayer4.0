@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:background="@android:color/transparent"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_height="match_parent"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/artistNameTV"
+        android:textStyle="bold"
+        android:textColor="@color/Black"
+        android:paddingLeft="5dp"
+        android:layout_marginRight="120dp"
+        android:paddingTop="8dp"
+        android:textSize="15dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:gravity="left"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

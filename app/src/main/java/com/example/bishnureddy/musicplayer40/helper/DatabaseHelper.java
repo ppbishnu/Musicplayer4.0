@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.example.bishnureddy.musicplayer40.Utility.Util;
 import com.example.bishnureddy.musicplayer40.model.Album;
+import com.example.bishnureddy.musicplayer40.model.Artist;
 import com.example.bishnureddy.musicplayer40.model.Song;
 
 import java.util.ArrayList;
@@ -22,6 +25,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ALBUM="tblalbum";
     private static final String TABLE_SONG="tblsong";
     private static final String TABLE_ALBUMSONGBRIDGE="tblalbumsongbridge";
+    private static final String TABLE_ARTIST="tblartist";
+    private static final String TABLE_ARTIST_SONG="tblartistsongbridge";
+
+
 
     private static final String KEY_ID = "_id";
     private static final String KEY_Name="name";
@@ -29,6 +36,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String KEY_ALBUMSONG_ALBUMID="_idalbum";
     private static final String KEY_ALBUMSONG_SONGID="_idsong";
+
+    private static final String KEY_ARTISTSONG_ARTISTID="_idartist";
+    private static final String KEY_ARTISTSONG_SONGID="_idsong";
 
     private static final String KEY_ALBUM_NOOFSONG="noofsong";
 
@@ -44,7 +54,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_ALBUM_TBL="create table "+TABLE_ALBUM +"("+KEY_ID+" integer primary key autoincrement, "+KEY_Name+" text, "+KEY_ALBUM_NOOFSONG+" integer,"+KEY_IMAGE+" BloB)";
     private static final String CREATE_SONG_TBL="create table "+TABLE_SONG +"("+KEY_ID+" integer primary key autoincrement, "+KEY_Name+" text,"+KEY_SONG_ARTIST+" text,"+KEY_SONG_ALBUMNAME+" text,"+KEY_SONG_PATH+" text,"+KEY_IMAGE+" BloB,"+KEY_SONG_ISPLAYING+" int,"+KEY_SONG_ISADDEDFAV+" int,"+KEY_SONG_DURATION+" int,"+KEY_SONG_ALBUMID+" int)";
     private static final String CREATE_ALBUMSONGBRIDGE_TBL="create table "+TABLE_ALBUMSONGBRIDGE+"("+KEY_ID+" integer primary key autoincrement, "+KEY_ALBUMSONG_ALBUMID+" integer,"+KEY_ALBUMSONG_SONGID+" integer)";
-
+    private static final String CREATE_ARTIST_TBL="create table "+TABLE_ARTIST +"("+KEY_ID+" integer primary key autoincrement, "+KEY_Name+" text)";
+    private static final String CREATE_ARTIST_SONG_TBL="create table "+TABLE_ARTIST_SONG +"("+KEY_ID+" integer primary key autoincrement,"+KEY_ARTISTSONG_ARTISTID+" integer, "+KEY_ARTISTSONG_SONGID+" integer)";
     public DatabaseHelper(Context context)
     {
         super(context,DATABASENAME,null,DATABASE_VERSION);
@@ -55,6 +66,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ALBUM_TBL);
         db.execSQL(CREATE_SONG_TBL);
         db.execSQL(CREATE_ALBUMSONGBRIDGE_TBL);
+        db.execSQL(CREATE_ARTIST_TBL);
+        db.execSQL(CREATE_ARTIST_SONG_TBL);
+
     }
     @Override
     public void onUpgrade(SQLiteDatabase db,int olderversion,int newerversion)
@@ -88,7 +102,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return album_id;
     }
 
+    public long createArtistSongBridge(Long artistid,Long songid) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_ARTISTSONG_ARTISTID, artistid);
+        values.put(KEY_ARTISTSONG_SONGID, songid);
+
+        // insert row
+        long album_id = db.insert(TABLE_ARTIST_SONG, null, values);
+        return album_id;
+    }
+    public long CreateArtist(String artistName) {
+        SQLiteDatabase db=this.getReadableDatabase();
+        ContentValues values=new ContentValues();
+        values.put(KEY_Name,artistName);
+        long artist_id=db.insert(TABLE_ARTIST,null,values);
+        return artist_id;
+    }
+
+    public long getArtistidByName(String artistName) {
+        SQLiteDatabase db=this.getReadableDatabase();
+        long artist_id=0;
+        String selectQuery = "SELECT  * FROM " + TABLE_ARTIST+" tbl where tbl."+KEY_Name+"='"+artistName+"' ";
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            artist_id =c.getInt(c.getColumnIndex(KEY_ID)) ;
+        }
+        return artist_id;
+    }
+
+
+    public List<Artist> getAllArtists()
+    {
+        List<Artist> artistList = new ArrayList<Artist>();
+        String selectQuery = "SELECT  * FROM " + TABLE_ARTIST;
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst())
+        {
+            do
+            {
+                Artist artist=new Artist();
+                artist.setId(c.getInt((c.getColumnIndex(KEY_ID))));
+                artist.setName(c.getString(c.getColumnIndex(KEY_Name)));
+                artistList.add(artist);
+            }while (c.moveToNext());
+        }
+        return artistList;
+    }
     public long createSong(Song song) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -108,35 +174,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return song_id;
     }
 
-
-public List<Song> getSongListByAlbumId(long albumid)
+/*
+public List<Song> getSongListById(long albumid,String filterType)
 {
-   /* String selectQuery="select * from "+TABLE_SONG+" tbl where tbl."+KEY_SONG_ALBUMID+"="+albumid+"";
-    List<Song> songList=new ArrayList<Song>();
-    SQLiteDatabase db = this.getReadableDatabase();
-    Cursor c = db.rawQuery(selectQuery, null);
+    filterType=Util.FilterType;
+        String selectQuery;
+        if(filterType=="album")
+        {
+            albumid= Util.album.getId();
+            selectQuery="select * from "+TABLE_SONG+" s where s."+KEY_ID+" in (select "+KEY_ALBUMSONG_SONGID+" from "+TABLE_ALBUMSONGBRIDGE+" a where a."+KEY_ALBUMSONG_ALBUMID+"="+albumid+")";
 
-    // looping through all rows and adding to list
-    if (c.moveToFirst()) {
-        do {
-            Song song = new Song();
-            song.setId(c.getInt((c.getColumnIndex(KEY_ID))));
-            song.setName((c.getString(c.getColumnIndex(KEY_Name))));
-            song.setArtist(c.getString(c.getColumnIndex(KEY_SONG_ARTIST)));
-            song.setDuration(c.getString(c.getColumnIndex(KEY_SONG_DURATION)));
-            song.setIsAddedToFav(c.getInt(c.getColumnIndex(KEY_SONG_ISADDEDFAV)));
-            song.setIsPlaying(c.getInt(c.getColumnIndex(KEY_SONG_ISPLAYING)));
-            song.setPath(c.getString(c.getColumnIndex(KEY_SONG_PATH)));
-            song.setSongImage(c.getBlob(c.getColumnIndex(KEY_IMAGE)));
-            song.setAlbumId(c.getInt(c.getColumnIndex(KEY_SONG_ALBUMID)));
-            // adding to todo list
-            songList.add(song);
-        } while (c.moveToNext());
-    }
-    */
-        String selectQuery="select * from tblsong s where s._id in (select _idsong from tblalbumsongbridge a where a._idalbum="+albumid+")";
+        }
+            else
+        {
+            long artistid=Util.artist.getId();
+            selectQuery="select * from "+TABLE_SONG+" s where s."+KEY_ID+" in (select "+KEY_ARTISTSONG_SONGID+" from "+TABLE_ARTIST_SONG+" a where a."+KEY_ARTISTSONG_ARTISTID+"="+artistid+")";
+        }
         List<Song> songList=new ArrayList<Song>();
+
         SQLiteDatabase db = this.getReadableDatabase();
+        if(albumid==-1)
+        {
+            return getAllSongs();
+        }
         Cursor c = db.rawQuery(selectQuery, null);
     // looping through all rows and adding to list
     if (c.moveToFirst()) {
@@ -150,15 +210,58 @@ public List<Song> getSongListByAlbumId(long albumid)
             song.setIsPlaying(c.getInt(c.getColumnIndex(KEY_SONG_ISPLAYING)));
             song.setPath(c.getString(c.getColumnIndex(KEY_SONG_PATH)));
             song.setSongImage(c.getBlob(c.getColumnIndex(KEY_IMAGE)));
-           /* song.setAlbumId(c.getInt(c.getColumnIndex(KEY_SONG_ALBUMID)));*/
             // adding to todo list
             songList.add(song);
         } while (c.moveToNext());
     }
     return songList;
-}
+}*/
 
 
+
+
+    public List<Song> getSongListById()
+    {
+        String filterType=Util.FilterType;
+        String selectQuery;
+        if(filterType=="album")
+        {
+            long albumid= Util.album.getId();
+            if(albumid==-1)
+            {
+                return getAllSongs();
+            }
+            selectQuery="select * from "+TABLE_SONG+" s where s."+KEY_ID+" in (select "+KEY_ALBUMSONG_SONGID+" from "+TABLE_ALBUMSONGBRIDGE+" a where a."+KEY_ALBUMSONG_ALBUMID+"="+albumid+")";
+
+        }
+        else
+        {
+            long artistid=Util.artist.getId();
+            selectQuery="select * from "+TABLE_SONG+" s where s."+KEY_ID+" in (select "+KEY_ARTISTSONG_SONGID+" from "+TABLE_ARTIST_SONG+" a where a."+KEY_ARTISTSONG_ARTISTID+"="+artistid+")";
+        }
+        List<Song> songList=new ArrayList<Song>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Song song = new Song();
+                song.setId(c.getInt((c.getColumnIndex(KEY_ID))));
+                song.setName((c.getString(c.getColumnIndex(KEY_Name))));
+                song.setArtist(c.getString(c.getColumnIndex(KEY_SONG_ARTIST)));
+                song.setDuration(c.getString(c.getColumnIndex(KEY_SONG_DURATION)));
+                song.setIsAddedToFav(c.getInt(c.getColumnIndex(KEY_SONG_ISADDEDFAV)));
+                song.setIsPlaying(c.getInt(c.getColumnIndex(KEY_SONG_ISPLAYING)));
+                song.setPath(c.getString(c.getColumnIndex(KEY_SONG_PATH)));
+                song.setSongImage(c.getBlob(c.getColumnIndex(KEY_IMAGE)));
+                // adding to todo list
+                songList.add(song);
+            } while (c.moveToNext());
+        }
+        return songList;
+    }
 
 
 
@@ -313,5 +416,8 @@ public void incrementNoSongOfAlbum(Long albumid)
         SQLiteDatabase db= this.getWritableDatabase();
         db.delete(TABLE_ALBUM, null, null);
         db.delete(TABLE_SONG, null, null);
+        db.delete(TABLE_ARTIST,null,null);
+        db.delete(TABLE_ALBUMSONGBRIDGE,null,null);
+        db.delete(TABLE_ARTIST_SONG,null,null);
     }
 }

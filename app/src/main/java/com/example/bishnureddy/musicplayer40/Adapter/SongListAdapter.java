@@ -1,6 +1,7 @@
 package com.example.bishnureddy.musicplayer40.Adapter;
 
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class SongListAdapter extends ArrayAdapter<Song>  {
         TextView txtTitle;
         TextView artists;
         TextView duration;
+        ImageView songImage;
     }
     public SongListAdapter(Activity context, List<Song> songslist)
     {
@@ -49,7 +51,8 @@ public class SongListAdapter extends ArrayAdapter<Song>  {
         {
             rowView= inflater.inflate(R.layout.activity_each_song, null, true);
 
-            viewHolder.playButton =(ImageView)rowView.findViewById(R.id.playIB);
+           /* viewHolder.playButton =(ImageView)rowView.findViewById(R.id.playIB);*/
+            viewHolder.songImage=(ImageView)rowView.findViewById(R.id.songimageIV);
             viewHolder.favButton =(ImageView)rowView.findViewById(R.id.AddToFavIB);
             viewHolder.txtTitle = (TextView) rowView.findViewById(R.id.songNameTV);
             viewHolder.artists = (TextView) rowView.findViewById(R.id.artists);
@@ -65,14 +68,22 @@ public class SongListAdapter extends ArrayAdapter<Song>  {
             viewHolder.txtTitle.setText(song.getName());
             viewHolder.artists.setText(song.getArtist());
             viewHolder.duration.setText(song.getDurationString());
-            if(song.getIsPlaying()==1)
+            if(song.getSongImage()!=null)
+            {
+                viewHolder.songImage.setImageBitmap(BitmapFactory.decodeByteArray(song.getSongImage(),0,song.getSongImage().length));
+            }
+            else {
+                viewHolder.songImage.setImageResource(R.mipmap.unknownimg);
+            }
+            /*if(song.getIsPlaying()==1)
             {
 
                 viewHolder.playButton.setImageResource(R.mipmap.pause);
             }
             else {
                 viewHolder.playButton.setImageResource(R.mipmap.play);
-            }
+            }*/
+            song=db.getSongById(song.getId());
             if(song.getIsAddedToFav()==1)
             {
                 viewHolder.favButton.setImageResource(R.mipmap.like_filled);
@@ -83,7 +94,7 @@ public class SongListAdapter extends ArrayAdapter<Song>  {
         }
 
 
-        viewHolder.playButton.setOnClickListener(new View.OnClickListener() {
+       /* viewHolder.playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 song=db.getSongById(song.getId());
@@ -117,7 +128,7 @@ public class SongListAdapter extends ArrayAdapter<Song>  {
                 }
             }
 
-        });
+        });*/
 
         viewHolder.favButton.setOnClickListener(new View.OnClickListener() {
             @Override
